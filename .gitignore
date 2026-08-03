@@ -1,0 +1,19 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# Terraform plans
+*.tfplan
+
+# Packages
+*.deb
+
+# Secrets
+*.pem
+*.key
+.env
+
+# Logs
+*.log
