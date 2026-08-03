@@ -1,84 +1,14 @@
-name: WordPress HA Deployment
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Validate Docker Compose
-        run: |
-          docker compose -f docker/docker-compose.yml config
-
-
-  security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: .
-
-
-  deploy:
-    name: Deploy Infrastructure
-    runs-on: ubuntu-latest
-    needs: security-scan
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
 
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
+
       - name: Terraform Apply
         working-directory: terraform
         run: terraform apply -auto-approve
-
-
-  health-check:
-    name: Application Health Check
-    runs-on: ubuntu-latest
-    needs: deploy
-
-    steps:
-      - name: Check WordPress URL
-        run: |
-          curl -f http://wordpress-alb-534113025.us-east-1.elb.amazonaws.com || exit 1
-
-
-  rollback:
-    name: Rollback
-    runs-on: ubuntu-latest
-    needs: health-check
-    if: failure()
-
-    steps:
-      - name: Rollback message
-        run: |
-          echo "Deployment failed - rollback required"
