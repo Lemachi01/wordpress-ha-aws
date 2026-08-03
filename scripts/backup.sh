@@ -1,30 +1,48 @@
 #!/bin/bash
 
-# Timestamp
 DATE=$(date +%Y-%m-%d-%H-%M)
 
-# Create backup directory
-mkdir -p /tmp/wordpress-backups
+BACKUP_DIR=/tmp/wordpress-backups
 
-# Database backup
+mkdir -p $BACKUP_DIR
+
+
+echo "Backing up database..."
+
+docker exec docker-mysql-1 \
 mysqldump \
 -u wordpress \
 -pwordpresspassword \
 wordpress \
-> /tmp/wordpress-backups/db-$DATE.sql
+> $BACKUP_DIR/db-$DATE.sql
 
-# Compress WordPress files
-tar -czf /tmp/wordpress-backups/wp-content-$DATE.tar.gz \
-/var/www/html/wp-content
 
-# Upload database backup
+echo "Backing up WordPress files..."
+
+docker cp \
+docker-wordpress-1:/var/www/html/wp-content \
+$BACKUP_DIR/wp-content-$DATE
+
+
+tar -czf \
+$BACKUP_DIR/wp-content-$DATE.tar.gz \
+-C $BACKUP_DIR \
+wp-content-$DATE
+
+
+rm -rf $BACKUP_DIR/wp-content-$DATE
+
+
+echo "Uploading backups to S3..."
+
 aws s3 cp \
-/tmp/wordpress-backups/db-$DATE.sql \
-s3://wordpress-backups/
+$BACKUP_DIR/db-$DATE.sql \
+s3://wordpress-backups-maureen/wordpress/
 
-# Upload WordPress files
+
 aws s3 cp \
-/tmp/wordpress-backups/wp-content-$DATE.tar.gz \
-s3://wordpress-backups/
+$BACKUP_DIR/wp-content-$DATE.tar.gz \
+s3://wordpress-backups-maureen/wordpress/
+
 
 echo "Backup completed: $DATE"

@@ -1,0 +1,42 @@
+This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking wordpress-alb-534113025.us-east-1.elb.amazonaws.com (be patient)
+
+
+Server Software:        Apache/2.4.68
+Server Hostname:        wordpress-alb-534113025.us-east-1.elb.amazonaws.com
+Server Port:            80
+
+Document Path:          /
+Document Length:        29 bytes
+
+Concurrency Level:      100
+Time taken for tests:   5.322 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      284272 bytes
+HTML transferred:       29000 bytes
+Requests per second:    187.89 [#/sec] (mean)
+Time per request:       532.220 [ms] (mean)
+Time per request:       5.322 [ms] (mean, across all concurrent requests)
+Transfer rate:          52.16 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      209  233  65.1    225    1247
+Processing:   209  226  29.2    222    1078
+Waiting:      209  225  11.1    222     278
+Total:        419  459  71.5    452    1476
+
+Percentage of the requests served within a certain time (ms)
+  50%    452
+  66%    461
+  75%    469
+  80%    475
+  90%    486
+  95%    493
+  98%    511
+  99%    519
+ 100%   1476 (longest request)
